@@ -1,0 +1,244 @@
+\documentclass{article}
+
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{verbatim}
+\usepackage{url}
+\usepackage{framed}
+
+\begin{document}
+
+\title{Homework 9}
+\author{Geoffrey Ulman\\
+        CSI740}
+\date{April 2012}
+\maketitle
+
+\section{Experiment One}\label{m1}
+
+The first experiment conducted was a duplicate of the experiment described in \emph{Trefethen and Bau}. An upper triangular matrix \(R\) with normal random entries was constructed, and a random unitary matrix was constructed by computing the QR decomposition of a matrix with normal random entries. This was done using the following MATLAB code.
+
+\begin{framed}
+\begin{verbatim}
+R = triu( randn(50) );
+[Q,X] = qr( randn(50) );
+\end{verbatim}
+\end{framed}
+
+The \(R\) and \(Q\) matrices were then used to construct an \(A\) matrix with a known QR decomposition (up to rounding errors). Finally, the Householder triangularization algorithm was applied to the \(A\) matrix to compute calculated \(R_2\) and \(Q_2\) matrices.
+
+\begin{framed}
+\begin{verbatim}
+A = Q*R;
+[Q2,R2] = qr( A );
+\end{verbatim}
+\end{framed}
+
+The relative errors between the \(R\) and \(R_2\), and \(Q\) and \(Q_2\) matrices matched the results from \emph{Trefethen and Bau}.
+
+\begin{framed}
+\begin{verbatim}
+norm(Q2-Q)
+    ans = 0.025698
+norm(R2-R)/norm(R)
+    ans = 0.0042685
+\end{verbatim}
+\end{framed}
+
+These extremely large errors can be accounted for by the condition number of \(R\). By constructing \(R\) as an upper triangular matrix with normal random entries, \(R\) is near singular with a high probability. The large forward errors between \(R\) and \(R_2\), and \(Q\) and \(Q_2\) matrices are caused by this ill-conditioning (see Theorem 15.1 in \emph{Trefethen and Bau}).
+
+\begin{framed}
+\begin{verbatim}
+cond(R)
+    ans = 6.3605e+16
+\end{verbatim}
+\end{framed}
+
+The relative error between \(A\) and \(R_2*Q_2\) also matched \emph{Trefethen and Bau}. This error is \( O\left(\epsilon_{Machine}\right) \), which is what we expect due to the backwards stability of the Householder triangularization algorithm.
+
+\begin{framed}
+\begin{verbatim}
+norm(A-Q2*R2)/norm(A)
+    ans = 6.2544e-16
+\end{verbatim}
+\end{framed}
+
+Randomly perturbing \(R2\) and \(Q2\) slightly to form \(R_3\) and \(Q_3\) and recalculating the above relative error results in error twelve orders of magnitude greater than \(R_2*Q_2\).
+
+\begin{framed}
+\begin{verbatim}
+Q3 = Q + (1e-4)*randn(50);
+R3 = R + (1e-4)*randn(50);
+norm(A-Q3*R3)/norm(A)
+    ans = 8.4933e-04
+\end{verbatim}
+\end{framed}
+
+Even if we ensure that the perturbed matrices are upper triangular and unitary (by zeroing out the lower triangular elements after perturbing, and by performing another QR decomposition on the nearly unitary \(Q3\)), the results are the same.
+
+\begin{framed}
+\begin{verbatim}
+[Q4 X] = qr( Q3 );
+R4 = triu(ones(50)).*R3; 
+norm(A-Q4*R4)/norm(A)
+    ans = 7.9220e-04
+\end{verbatim}
+\end{framed}
+
+\section{Experiment Two}\label{m2}
+
+To verify that the poor relative error between \(R\) and \(R_2\) was due to the ill-conditioning of \(R\), the same experiment was performed using an \(R\) matrix with ones for all upper triangular entries and a \(Q\) matrix constructed as before.
+
+\begin{framed}
+\begin{verbatim}
+R = triu( ones(50) );
+[Q,X] = qr( randn(50) );
+\end{verbatim}
+\end{framed}
+
+With the significantly reduced condition number of \(R\), both the forward and backward errors have error \( O\left(\epsilon_{Machine}\right) \).
+
+\begin{framed}
+\begin{verbatim}
+cond(R)
+    ans = 64.270
+norm(Q2-Q)
+    ans = 3.7964e-15
+norm(R2-R)/norm(R)
+    ans = 7.0724e-16
+norm(A-Q2*R2)/norm(A)
+    ans = 3.2075e-16
+\end{verbatim}
+\end{framed}
+
+\section{Experiment Three}\label{m3}
+
+Rounding errors prevent the constructed \(Q\) and \(R\) matrices from being the exact QR decomposition of \(A\). This situation can be partially remedied by constructing the \(Q\) and \(R\) matrices in single precision and building the \(A\) matrix in double precision. This reduces the rounding errors caused by constructing the \(A\) matrix.
+
+\begin{framed}
+\begin{verbatim}
+R = single( triu( randn(50) ) );
+[Q,X] = qr( rand(50) );
+Q = single( Q );
+A = double( Q ) * double( R );
+[Q2,R2] = qr( A );
+\end{verbatim}
+\end{framed}
+
+However, the \(R\) matrix is still ill-conditioned, and the results are the same as the first experiment. Small rounding errors in the construction of \(A\) don't affect the fact that it is ill-conditioned, which is what is driving the poor forward errors.
+
+\begin{framed}
+\begin{verbatim}
+norm(Q2-Q)
+    ans = 0.05512
+norm(R2-R)/norm(R)
+    ans = 0.00894
+norm(A-Q2*R2)/norm(A)
+    ans = 5.58046e-16
+\end{verbatim}
+\end{framed}
+
+\section{Experiment Four}\label{m4}
+
+Experiment four used a small 2 by 2 \(A\) matrix constructed from a well conditioned, integer valued \(R\) matrix and a \(-0.1\) radian rotation matrix \(Q\).
+
+\begin{equation}
+R =
+  \begin{bmatrix}
+    1 & 2 \\
+    0 & 3 \\
+  \end{bmatrix}
+\hspace{.2in}
+Q = 
+  \begin{bmatrix}
+    cos(\theta) & -sin(\theta) \\
+    sin(\theta) & cos(\theta) \\
+  \end{bmatrix}
+\label{eq1}
+\end{equation}
+
+\begin{framed}
+\begin{verbatim}
+R = [ 1 2 ; 0 3 ];
+theta = -0.1;
+Q = [ cos(theta) -sin(theta) ; sin(theta) cos(theta) ];
+A = Q * R;
+[Q2,R2] = qr( A );
+\end{verbatim}
+\end{framed}
+
+The Householder triangularization finds \(Q2\) and \(R2\) with the first column and row (respectively) multiplied by a factor of \(-1\). 
+
+\begin{framed}
+\begin{verbatim}
+Q2(:,1)*=-1;
+R2(1,:)*=-1;
+\end{verbatim}
+\end{framed}
+
+The matrices \(R\) and \(Q\) are well conditioned, so both the forward and backward errors are small.
+
+\begin{framed}
+\begin{verbatim}
+norm(Q2-Q)
+    ans = 1.17574e-16
+norm(R2-R)/norm(R)
+    ans = 1.36018-16
+norm(A-Q2*R2)/norm(A)
+    ans = 3.04147e-17
+\end{verbatim}
+\end{framed}
+
+\section{Experiment Five}\label{m5}
+
+Experiment five uses a poorly conditioned upper triangular \(R\) matrix and the same rotation matrix as Experiment 4 for \(Q\).
+
+\begin{equation}
+R =
+  \begin{bmatrix}
+    1 & 1 \\
+    0 & \epsilon_{Machine} \\
+  \end{bmatrix}
+\hspace{.2in}
+Q = 
+  \begin{bmatrix}
+    cos(\theta) & -sin(\theta) \\
+    sin(\theta) & cos(\theta) \\
+  \end{bmatrix}
+\label{eq2}
+\end{equation}
+
+\begin{framed}
+\begin{verbatim}
+R = [ 1 1 ; 0 eps ];
+theta = -0.1;
+Q = [ cos(theta) -sin(theta) ; sin(theta) cos(theta) ];
+A = Q * R;
+[Q2,R2] = qr( A );
+\end{verbatim}
+\end{framed}
+
+However, despite the ill-conditioning of \(A\), the forward and backward errors are small. This demonstrates that the relationship 15.2 in \emph{Trefethen and Bau} between the forward error, backward error, and condition number is an upper bound. The actual forward error may be smaller for certain problems (as is the case here).
+
+\begin{equation}
+\frac{\left \| \tilde{f}\left(x\right)-f\left(x\right) \right \|}{f\left(x\right)}  \leq \left(\kappa\left(x\right)+o\left(1\right)\right)\frac{\left \| \tilde{x}-x \right \|}{\left \| x \right \|}
+\label{eq3}
+\end{equation}
+
+\begin{framed}
+\begin{verbatim}
+cond(A)
+    ans = 9.0072e+15
+norm(Q2-Q)
+    ans = 1.1102e-16
+norm(R2-R)/norm(R)
+    ans = 7.9116e-17
+norm(A-Q2*R2)/norm(A)
+    ans =  7.8505e-17
+\end{verbatim}
+\end{framed}
+
+\end{document}

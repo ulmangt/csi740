@@ -1,0 +1,21 @@
+
+Problem 10.3
+
+The error between mgs.m and the built-in MATLAB qr() command is provided below and is on the order of 1e-16.
+
+The matrix produced by house.m appears significantly different. It is still a valid QR factorization as indicated by very small difference between the original A matrix and the QR matrix.
+
+However, we note that if the less numerically stable Householder reflection vector is chosen, the resulting Q and R matricies are those prodiced by mgs.m and the MATLAB qr() command (with an error on the order of 1e-16).
+
+MSG / QR  Q Error: 3.45094e-16
+MSG / QR  R Error: 1.20891e-15
+
+QR / House  Q Error: 1.72085e-16
+QR / House  R Error: 1.03621e-15
+
+House / MGS  Q Error: 4.32062e-16
+House / MGS  R Error: 1.70234e-15
+
+House Reconstructed A Error: 1.19904e-15
+MGS Reconstructed A Error: 4.44089e-17
+QR Reconstructed A Error: 6.21725e-16
