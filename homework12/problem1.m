@@ -1,4 +1,7 @@
 
+% Matlab driver code to apply the powerIteration and
+% rayleighQuotientIteration commands to the provided data
+
 % input the A matrix
 A = [ 1 1  1   1   1   1 ;
       1 2  3   4   5   6 ;
@@ -13,17 +16,17 @@ A = [ 1 1  1   1   1   1 ;
 % check the results using Matlab's built-in command
 [V,D] = eig( A )
 
-% n_trials = 1000;
-% iteration_counts = zeros(n_trials,1);
-% for i = 1:n_trials
-%     
-%     [~,~,k] = rayleighQuotientIteration( A );
-%     iteration_counts(i) = k;
-%     
-% end
-% 
-% figure;
-% hist( iteration_counts, 3:1:20 );
-% title( 'Iterations Necessary For 1000 Random Starting Vectors' );
-% ylabel( 'Count' );
-% xlabel( 'Iterations' );
+n_trials = 1000;
+iteration_counts = zeros(n_trials,1);
+for i = 1:n_trials
+    
+    [~,~,k] = rayleighQuotientIteration( A );
+    iteration_counts(i) = k;
+    
+end
+
+figure;
+hist( iteration_counts, 3:1:20 );
+title( 'Iterations Necessary For 1000 Random Starting Vectors' );
+ylabel( 'Count' );
+xlabel( 'Iterations' );

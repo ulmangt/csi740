@@ -104,4 +104,60 @@ Iteration & Eigenvalue & Error \\
 \caption{Rayleigh Quotient Iteration: Error in Calculated Eigenvalue by Iteration}
 \label{p2f1}
 \end{figure}
+
+\section{QR Iteration}\label{p3}
+
+QR iteration was implemented according to Algorithm 28.1 with the magnitude of the largest off-diagonal lower-triangular element used as a stopping condition. All calculations were run until this value dropped below \(10^{-12}\).
+
+Figure \ref{p3f1} charts the progression of this error over the 21 iterations necessary to reach the stopping condition. The final \(A\) matrix is shown by Figure \ref{p3m1}. Note that because \(A\) was symmetric, the QR iteration is converging to a diagonal matrix with the eigenvalues of \(A\) as the diagonal elements.
+
+Figure \ref{p3f2} charts the same error metric for the non-symmetric \(A\) matrix. It is notable that the algorithm took significantly longer, 31 iterations instead of 21, to reach the stopping condition. The final \(A\) matrix is shown by Figure \ref{p3m2}. As expected, the matrix is upper-triangular instead of diagonal, but still contains the eigenvalues of \(A\) as diagonal elements.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{Problem3Figure1.png}
+\caption{QR Iteration: Magnitude of Largest Lower Triangular Element (Symmetric Input)}
+\label{p3f1}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{Problem3Figure1.png}
+\caption{QR Iteration: Magnitude of Largest Lower Triangular Element (Non-Symmetric Input)}
+\label{p3f2}
+\end{figure}
+
+\begin{figure}
+\centering
+\(
+\begin{bmatrix}
+  332.8463 &  -0.0000 &  -0.0000 &   0.0000 &   0.0000 &  -0.0000 \\[0.3em]
+    0.0000 &  15.5535 &  -0.0000 &   0.0000 &  -0.0000 &  -0.0000 \\[0.3em]
+    0.0000 &   0.0000 &   2.0436 &   0.0000 &  -0.0000 &   0.0000 \\[0.3em]
+    0.0000 &   0.0000 &   0.0000 &   0.4893 &   0.0000 &   0.0000 \\[0.3em]
+    0.0000 &   0.0000 &   0.0000 &   0.0000 &   0.0643 &  -0.0000 \\[0.3em]
+    0.0000 &   0.0000 &   0.0000 &   0.0000 &   0.0000 &   0.0030
+\end{bmatrix}
+\)
+\label{p3m1}
+\caption{QR Iteration End Result (Symmetric Input)}
+\end{figure}
+
+
+\begin{figure}
+\centering
+\(
+\begin{bmatrix}
+  332.8421 & -0.1042  & 0.3624 & -0.7312 &  0.2155 & -0.1595 \\[0.3em]
+    0.0000 & 15.5913  & 0.2005 & -0.3372 &  0.1193 & -0.0774 \\[0.3em]
+    0.0000 &  0.0000  & 1.9256 & -0.2344 & -0.0001 & -0.0377 \\[0.3em]
+    0.0000 &  0.0000  & 0.0000 &  0.6019 &  0.1396 & -0.0270 \\[0.3em]
+    0.0000 &  0.0000  & 0.0000 &  0.0000 &  0.0267 & -0.0225 \\[0.3em]
+    0.0000 &  0.0000  & 0.0000 &  0.0000 &  0.0000 &  0.0125
+\end{bmatrix}
+\)
+\label{p3m2}
+\caption{QR Iteration End Result (Non-Symmetric Input)}
+\end{figure}
+
 \end{document}
