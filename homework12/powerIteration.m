@@ -48,6 +48,8 @@ for k = 1:max_iterations
     
 end
 
+lambdas
+
 lambda = lambdas(k);
 
 if ( make_plots )
