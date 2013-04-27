@@ -1,5 +1,5 @@
-function [v,lambda,k] = powerIteration( A, v, make_plots )
-% powerIteration( A )
+function [v,lambda,k] = rayleighQuotientIteration( A, v, make_plots )
+% rayleighQuotientIteration( A )
 % Given a mxm real symmetric matrix A, returns the largest eigenvalue
 % of A along with the corresponding eigenvector
 %
@@ -21,12 +21,15 @@ if nargin < 2
 
 end
 
+% calculate initial lambda guess using Rayleigh Quotient
+lambda = v'*A*v;
+
 % the maximum number of iterations to perform
 max_iterations = 100;
 
 % algorithm will stop when the difference between
 % successive eigenvalues falls below the value
-stop_threshold = 1e-10;
+stop_threshold = 1e-8;
 
 % store all the previous eigenvalues, for plotting
 % and for stopping criteria calculation
@@ -34,9 +37,10 @@ lambdas = zeros( max_iterations, 1 );
 
 for k = 1:max_iterations
 
-    w = A * v;
+    w = ( A - lambda*eye(m) ) \ v;
     v = w / norm( w );
-    lambdas(k) = v'*A*v;
+    lambda = v'*A*v;
+    lambdas(k) = lambda;
     
     % check the stopping condition
     if ( k > 1 )
@@ -48,10 +52,12 @@ for k = 1:max_iterations
     
 end
 
+lambdas
+
 lambda = lambdas(k);
 
 if ( make_plots )
     plotResults( A, k, lambdas );
 end
-    
+
 end

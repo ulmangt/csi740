@@ -9,6 +9,10 @@
 \usepackage{url}
 \usepackage{framed}
 \usepackage{booktabs}
+\usepackage{mathtools}
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
 
 \begin{document}
 
@@ -18,13 +22,18 @@
 \date{April 2012}
 \maketitle
 
-\section{Problem 1}\label{p1}
+\section{Power Iteration}\label{p1}
 
 The power iteration algorithm was implemented as specified in Algorithm 27.1 with the rate of change in the calculated eigenvalue used as a stopping condition. All calculations were run until the rate of change dropped below \(10^{-8}\).
 
-Figures \ref{p1t1} and \ref{p1f1} summarize the convergence rate of the power iteration algoirhtm on the \(A\) matrix for a random initialization vector. Figure \ref{p1f1} plots the difference between the actual largest eigenvalue (as calculated by Matlab's \verb|eig| command) and the calculated eigenvalue on a log scale. Because the trend appears linear on the log scale, the convergence rate appears to be exponential.
+Figures \ref{p1t1} and \ref{p1f1} summarize the convergence rate of the power iteration algorithm on the \(A\) matrix for a random initialization vector. Figure \ref{p1f1} plots the difference between the actual largest eigenvalue (as calculated by Matlab's \verb|eig| command) and the calculated eigenvalue on a log scale. Figure \ref{p1t1} prints these differences in tabular form. From these results we observe that each iteration improves the accuracy of the result by approximately three digits. This is a linear convergence rate (the error is decreasing by a constant multiple every iteration).
 
-Figure \ref{p1f2} plots the \(R_m\) ratio at each iteration. The blue line indicates the square of the ratio between the true second-largest and largest eigenvalues of \(A\) as calculated by Matlab's \verb|eig| command. As expected, these values agree quite well.
+\begin{equation}
+R_m=\abs*{\frac{\lambda_2}{\lambda_1}}^2
+\label{eq2}
+\end{equation}
+
+Theorem 27.1 tells us to expect the error to decrease by the constant multiple \(R_m\) (given by equation \ref{eq2}) at every iteration. Figure \ref{p1f2} plots the \(R_m\) ratio at each iteration. The blue line indicates the square of the ratio between the true second-largest and largest eigenvalues of \(A\) as calculated by Matlab's \verb|eig| command. These values match quite well with the observed improvement of three digits of accuracy per step.
 
 Finally, Figure \ref{p1f3} summarizes the number of iterations necessary to meet the stopping criteria for 1000 runs of the power iteration algorithm, each with a different random initial vector. A small number of initial vectors required one additional or one less iteration to converge. However, in general the choice of initial vector has little to no impact on the convergence rate. Of course, if a degenerate vector is chosen, like the zero vector or one of the other eigenvectors of \(A\), then the algorithm may fail.
 
@@ -67,4 +76,32 @@ Iteration & Eigenvalue & Error \\
 \label{p1f3}
 \end{figure}
 
+\section{Rayleigh Quotient Iteration}\label{p2}
+
+Figures \ref{p2t1} and \ref{p2f1} summarize the convergence rate of the Rayleigh Quotient iteration algorithm on the \(A\) matrix for a random initialization vector. Figure \ref{p2f1} plots the difference between the actual largest eigenvalue (as calculated by Matlab's \verb|eig| command) and the calculated eigenvalue on a log scale. Figure \ref{p2t1} prints these differences in tabular form. The calculated eigenvalue converges much faster than for power iteration. There are no decimal places of accuracy on the first iteration, three on the second, and the calculated value exactly matches the value calculated by Matlab on the third iteration. This appears in line with the cubic convergence rate expected based on Theorem 27.3.
+
+However, the choice of initial vector is significantly more important for the Rayleigh Quotient iteration algorithm. Whereas power iteration always converged to the largest eigenvalue in approximately the same number of iterations regardless of the choice of initial vector (barring a small number of degenerate choices), Rayleigh Quotient iteration can converge to any eigenvalue. Therefore, the chosen initial vector must be sufficiently close to the eigenvector corresponding to the eigenvalue we wish to find. Fortunately, it appears that the range of initial vectors which converge to the largest eigenvalues is significantly larger than for the smaller eigenvalues.
+
+\begin{figure}
+\centering
+\begin{tabular}{lrr}
+\toprule
+Iteration & Eigenvalue & Error \\
+\midrule
+ 1 & 329.4913308900763 & 3.354984516978561 \\
+ 2 & 332.8459395164913 & 0.000375890563589 \\
+ 3 & 332.8463154070549 & 0.000000000000000 \\
+ 4 & 332.8463154070549 & 0.000000000000000 \\
+\bottomrule
+\label{p2t1}
+\end{tabular}
+\caption{Rayleigh Quotient Iteration: Error in Calculated Eigenvalue by Iteration}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{Problem2Figure1.png}
+\caption{Rayleigh Quotient Iteration: Error in Calculated Eigenvalue by Iteration}
+\label{p2f1}
+\end{figure}
 \end{document}
